@@ -10,6 +10,23 @@
 
 ## 核心功能规划
 
+## 功能状态
+
+状态说明：
+- [x] ✅ 已完成
+- [ ] 🚧 开发中
+- [ ] 🗓️ 规划中
+
+任务列表：
+- [ ] 工作记录（新增/编辑/按日期查看）：网页端快速录入 + 草稿/发布/编辑
+- [ ] 项目与任务关联：记录关联项目/模块/任务，汇总进展与风险
+- [ ] 周报与总结（日报/周报/月报）：按时间范围汇总，支持手动补充
+- [ ] 工作复盘：问题、阻塞原因、解决过程、经验沉淀
+- [ ] 检索与统计：按日期/项目/标签/关键词检索与统计
+- [ ] AI 自动整理工作记录：自由文本解析为结构化记录，进入待确认
+- [ ] AI 总结生成（周报/月报）：基于时间范围记录生成总结草稿
+- [ ] 钉钉机器人接入（消息入库 + AI解析）：发送消息自动入库并结构化解析
+
 ### 1. 工作记录 - 新增每日工作记录 
 - 记录工作事项、完成情况、耗时与备注
 - 支持草稿、发布与编辑
@@ -44,10 +61,36 @@
 - 数据看板：工作量、项目投入、成果与趋势统计 
 
 ## 技术栈 
-- 后端：Spring Boot、MyBatis-Plus、MySQL、Redis、Spring-ai-alibaba
+- 后端：Spring Boot、MyBatis-Plus、MySQL、Redis
 - 前端：Vue 3、TypeScript
 - 部署：Docker Compose、Nginx
-- AI能力：AI 总结、AI 周报生成、AI 风险识别、AI 工作复盘建议
+- AI能力：支持 OpenAI 兼容接口（可配置 baseUrl / apiKey / model），用于 AI 整理与总结
+
+## 本地开发
+
+目录结构：
+- `backend/` 后端服务
+- `frontend/` 前端 Web
+- `deploy/` 部署相关（待补充）
+
+前端启动：
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+后端启动（需要本机可访问 Maven 仓库下载依赖）：
+```bash
+cd backend
+mvn -s maven-settings.xml -DskipTests spring-boot:run
+```
+
+后端默认配置：
+- 默认登录账号：`admin` / `admin123`（可通过 `DEFAULT_USERNAME` / `DEFAULT_PASSWORD` 覆盖）
+- 数据库连接：通过 `DB_URL` / `DB_USERNAME` / `DB_PASSWORD` 配置
+- AI 配置：`AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL`
+- 钉钉回调：`DINGTALK_ENABLED` / `DINGTALK_TOKEN` / `DINGTALK_AES_KEY` / `DINGTALK_APP_KEY`
 
 ## 后续规划 
 - 接入 AI 自动整理工作记录
