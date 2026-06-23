@@ -61,10 +61,36 @@
 - 数据看板：工作量、项目投入、成果与趋势统计 
 
 ## 技术栈 
-- 后端：Spring Boot、MyBatis-Plus、MySQL、Redis、Spring-ai-alibaba
+- 后端：Spring Boot、MyBatis-Plus、MySQL、Redis
 - 前端：Vue 3、TypeScript
 - 部署：Docker Compose、Nginx
-- AI能力：AI 总结、AI 周报生成、AI 风险识别、AI 工作复盘建议
+- AI能力：支持 OpenAI 兼容接口（可配置 baseUrl / apiKey / model），用于 AI 整理与总结
+
+## 本地开发
+
+目录结构：
+- `backend/` 后端服务
+- `frontend/` 前端 Web
+- `deploy/` 部署相关（待补充）
+
+前端启动：
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+后端启动（需要本机可访问 Maven 仓库下载依赖）：
+```bash
+cd backend
+mvn -s maven-settings.xml -DskipTests spring-boot:run
+```
+
+后端默认配置：
+- 默认登录账号：`admin` / `admin123`（可通过 `DEFAULT_USERNAME` / `DEFAULT_PASSWORD` 覆盖）
+- 数据库连接：通过 `DB_URL` / `DB_USERNAME` / `DB_PASSWORD` 配置
+- AI 配置：`AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL`
+- 钉钉回调：`DINGTALK_ENABLED` / `DINGTALK_TOKEN` / `DINGTALK_AES_KEY` / `DINGTALK_APP_KEY`
 
 ## 后续规划 
 - 接入 AI 自动整理工作记录
