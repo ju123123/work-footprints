@@ -93,7 +93,6 @@ public class DingtalkController {
         if (!StringUtils.hasText(text)) {
             return;
         }
-        workRecordService.create(userId, "DINGTALK", text, null);
+        workRecordService.create(userId, "DINGTALK", text, null, null, null, null, null);
     }
 }
-

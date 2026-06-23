@@ -2,6 +2,7 @@ package com.workfootprint.controller;
 
 import com.workfootprint.dto.report.GenerateReportRequest;
 import com.workfootprint.dto.report.ReportDto;
+import com.workfootprint.dto.report.UpdateReportRequest;
 import com.workfootprint.entity.ReportEntity;
 import com.workfootprint.security.SecurityUtils;
 import com.workfootprint.security.UserPrincipal;
@@ -35,6 +36,16 @@ public class ReportController {
         return reportService.list(user.userId()).stream().map(this::toDto).toList();
     }
 
+    @PatchMapping("/{id}")
+    public ReportDto update(@PathVariable("id") long id, @Valid @RequestBody UpdateReportRequest request) {
+        UserPrincipal user = SecurityUtils.currentUser();
+        ReportEntity e = reportService.updateContent(user.userId(), id, request.getContent());
+        if (e == null) {
+            throw new NotFoundException();
+        }
+        return toDto(e);
+    }
+
     private ReportDto toDto(ReportEntity e) {
         ReportDto d = new ReportDto();
         d.setId(e.getId());
@@ -47,4 +58,3 @@ public class ReportController {
         return d;
     }
 }
-

@@ -28,6 +28,29 @@
     <div v-if="editing" class="drawer">
       <div class="drawer-card">
         <div class="drawer-title">编辑并确认</div>
+        <div class="row">
+          <div class="field">
+            <label>关联项目</label>
+            <select v-model="form.projectId" class="input">
+              <option value="">不关联</option>
+              <option v-for="p in projects" :key="p.id" :value="String(p.id)">{{ p.name }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>关联模块</label>
+            <select v-model="form.moduleId" class="input" :disabled="!form.projectId">
+              <option value="">不关联</option>
+              <option v-for="m in modules" :key="m.id" :value="String(m.id)">{{ m.name }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>关联任务</label>
+            <select v-model="form.taskId" class="input" :disabled="!form.projectId">
+              <option value="">不关联</option>
+              <option v-for="t in tasks" :key="t.id" :value="String(t.id)">{{ t.name }}</option>
+            </select>
+          </div>
+        </div>
         <div class="field">
           <label>项目</label>
           <input v-model="form.projectName" class="input" />
@@ -62,15 +85,21 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { api } from '../api/client'
-import type { WorkRecord } from '../api/types'
+import type { Project, ProjectModule, ProjectTask, WorkRecord } from '../api/types'
 
 const pending = ref<WorkRecord[]>([])
 const loading = ref(false)
+const projects = ref<Project[]>([])
+const modules = ref<ProjectModule[]>([])
+const tasks = ref<ProjectTask[]>([])
 
 const editing = ref<WorkRecord | null>(null)
 const form = reactive({
+  projectId: '',
+  moduleId: '',
+  taskId: '',
   projectName: '',
   moduleName: '',
   taskSummary: '',
@@ -96,6 +125,9 @@ const confirm = async (id: number) => {
 
 const openEdit = (r: WorkRecord) => {
   editing.value = r
+  form.projectId = r.projectId ? String(r.projectId) : ''
+  form.moduleId = r.moduleId ? String(r.moduleId) : ''
+  form.taskId = r.taskId ? String(r.taskId) : ''
   form.projectName = r.projectName || ''
   form.moduleName = r.moduleName || ''
   form.taskSummary = r.taskSummary || ''
@@ -110,12 +142,60 @@ const closeEdit = () => {
 
 const saveAndConfirm = async () => {
   if (!editing.value) return
-  await api.patch(`/api/records/${editing.value.id}`, { ...form, status: 'CONFIRMED' })
+  const payload: any = { ...form, status: 'CONFIRMED' }
+  payload.projectId = form.projectId ? Number(form.projectId) : null
+  payload.moduleId = form.moduleId ? Number(form.moduleId) : null
+  payload.taskId = form.taskId ? Number(form.taskId) : null
+  await api.patch(`/api/records/${editing.value.id}`, payload)
   editing.value = null
   await load()
 }
 
+const loadProjects = async () => {
+  const res = await api.get('/api/projects')
+  projects.value = res.data
+}
+
+const loadModules = async (pid: string) => {
+  if (!pid) {
+    modules.value = []
+    return
+  }
+  const res = await api.get(`/api/projects/${pid}/modules`)
+  modules.value = res.data
+}
+
+const loadTasks = async (pid: string, mid: string) => {
+  if (!pid) {
+    tasks.value = []
+    return
+  }
+  const params: any = {}
+  if (mid) params.moduleId = mid
+  const res = await api.get(`/api/projects/${pid}/tasks`, { params })
+  tasks.value = res.data
+}
+
+watch(
+  () => form.projectId,
+  async (pid) => {
+    form.moduleId = ''
+    form.taskId = ''
+    await loadModules(pid)
+    await loadTasks(pid, '')
+  }
+)
+
+watch(
+  () => form.moduleId,
+  async (mid) => {
+    form.taskId = ''
+    await loadTasks(form.projectId, mid)
+  }
+)
+
 onMounted(load)
+onMounted(loadProjects)
 </script>
 
 <style scoped>
@@ -224,6 +304,11 @@ onMounted(load)
   font-weight: 600;
   margin-bottom: 10px;
 }
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 .field {
   display: flex;
   flex-direction: column;
@@ -248,4 +333,3 @@ label {
   margin-top: 14px;
 }
 </style>
-

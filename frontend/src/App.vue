@@ -6,7 +6,9 @@
         <RouterLink to="/">记录</RouterLink>
         <RouterLink to="/inbox">整理箱</RouterLink>
         <RouterLink to="/records">列表</RouterLink>
+        <RouterLink to="/projects">项目</RouterLink>
         <RouterLink to="/reports">总结</RouterLink>
+        <RouterLink to="/stats">统计</RouterLink>
       </nav>
       <div class="user">
         <span class="name">{{ auth.username }}</span>

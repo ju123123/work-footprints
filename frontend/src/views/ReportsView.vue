@@ -2,7 +2,10 @@
   <div class="page">
     <div class="header">
       <div class="title">工作总结</div>
-      <button class="btn" @click="load">刷新</button>
+      <div class="header-actions">
+        <button class="btn" @click="load">刷新</button>
+        <button class="primary" :disabled="!selectedId || loadingSave" @click="save">保存修改</button>
+      </div>
     </div>
 
     <div class="card">
@@ -44,10 +47,12 @@ const type = ref('周报')
 const startDate = ref(dayjs().startOf('week').add(1, 'day').format('YYYY-MM-DD'))
 const endDate = ref(dayjs().endOf('week').add(1, 'day').format('YYYY-MM-DD'))
 const content = ref('')
+const selectedId = ref<number | null>(null)
 
 const reports = ref<Report[]>([])
 const loading = ref(false)
 const loadingGenerate = ref(false)
+const loadingSave = ref(false)
 
 const load = async () => {
   loading.value = true
@@ -68,6 +73,7 @@ const generate = async () => {
       endDate: endDate.value,
     })
     content.value = res.data.content
+    selectedId.value = res.data.id
     await load()
   } finally {
     loadingGenerate.value = false
@@ -76,9 +82,21 @@ const generate = async () => {
 
 const select = (r: Report) => {
   content.value = r.content
+  selectedId.value = r.id
 }
 
 onMounted(load)
+
+const save = async () => {
+  if (!selectedId.value) return
+  loadingSave.value = true
+  try {
+    await api.patch(`/api/reports/${selectedId.value}`, { content: content.value })
+    await load()
+  } finally {
+    loadingSave.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -91,6 +109,11 @@ onMounted(load)
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 .title {
   font-weight: 600;
@@ -177,4 +200,3 @@ onMounted(load)
   font-size: 13px;
 }
 </style>
-

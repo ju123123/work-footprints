@@ -4,7 +4,8 @@
       <div class="card-title">快速记录</div>
       <textarea v-model="rawContent" class="textarea" rows="5" placeholder="用自然语言输入今天做了什么…" />
       <div class="actions">
-        <button class="primary" :disabled="loadingCreate || !rawContent.trim()" @click="onCreate">保存并AI整理</button>
+        <button class="btn" :disabled="loadingCreate || !rawContent.trim()" @click="onCreateDraft">保存草稿</button>
+        <button class="primary" :disabled="loadingCreate || !rawContent.trim()" @click="onCreatePublish">发布并AI整理</button>
         <div class="meta">
           <span>今日记录：{{ records.length }}</span>
           <span>待确认：{{ pending.length }}</span>
@@ -72,7 +73,18 @@ const load = async () => {
   }
 }
 
-const onCreate = async () => {
+const onCreateDraft = async () => {
+  loadingCreate.value = true
+  try {
+    await api.post('/api/records', { rawContent: rawContent.value, status: 'DRAFT' })
+    rawContent.value = ''
+    await load()
+  } finally {
+    loadingCreate.value = false
+  }
+}
+
+const onCreatePublish = async () => {
   loadingCreate.value = true
   try {
     await api.post('/api/records', { rawContent: rawContent.value })
@@ -137,6 +149,13 @@ onMounted(load)
   color: #ffffff;
   cursor: pointer;
 }
+.btn {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
 .primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -188,4 +207,3 @@ onMounted(load)
   font-size: 13px;
 }
 </style>
-

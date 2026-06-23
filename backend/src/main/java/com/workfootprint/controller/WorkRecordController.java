@@ -28,7 +28,16 @@ public class WorkRecordController {
     @ResponseStatus(HttpStatus.CREATED)
     public WorkRecordDto create(@Valid @RequestBody CreateWorkRecordRequest request) {
         UserPrincipal user = SecurityUtils.currentUser();
-        WorkRecordEntity e = workRecordService.create(user.userId(), "WEB", request.getRawContent(), request.getRecordDate());
+        WorkRecordEntity e = workRecordService.create(
+                user.userId(),
+                "WEB",
+                request.getRawContent(),
+                request.getRecordDate(),
+                request.getStatus(),
+                request.getProjectId(),
+                request.getModuleId(),
+                request.getTaskId()
+        );
         return toDto(e);
     }
 
@@ -42,6 +51,29 @@ public class WorkRecordController {
     public List<WorkRecordDto> pending() {
         UserPrincipal user = SecurityUtils.currentUser();
         return workRecordService.listPending(user.userId()).stream().map(this::toDto).toList();
+    }
+
+    @GetMapping("/search")
+    public List<WorkRecordDto> search(
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(value = "projectId", required = false) Long projectId,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "tag", required = false) String tag
+    ) {
+        UserPrincipal user = SecurityUtils.currentUser();
+        return workRecordService.search(user.userId(), startDate, endDate, projectId, status, keyword, tag).stream().map(this::toDto).toList();
+    }
+
+    @PostMapping("/{id}/publish")
+    public WorkRecordDto publish(@PathVariable("id") long id) {
+        UserPrincipal user = SecurityUtils.currentUser();
+        WorkRecordEntity e = workRecordService.publish(user.userId(), id);
+        if (e == null) {
+            throw new NotFoundException();
+        }
+        return toDto(e);
     }
 
     @PatchMapping("/{id}")
@@ -70,6 +102,9 @@ public class WorkRecordController {
         d.setSource(e.getSource());
         d.setRawContent(e.getRawContent());
         d.setRecordDate(e.getRecordDate());
+        d.setProjectId(e.getProjectId());
+        d.setModuleId(e.getModuleId());
+        d.setTaskId(e.getTaskId());
         d.setProjectName(e.getProjectName());
         d.setModuleName(e.getModuleName());
         d.setTaskSummary(e.getTaskSummary());
@@ -83,4 +118,3 @@ public class WorkRecordController {
         return d;
     }
 }
-

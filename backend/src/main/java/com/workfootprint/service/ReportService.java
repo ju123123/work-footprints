@@ -60,5 +60,16 @@ public class ReportService {
                 .eq(ReportEntity::getUserId, userId)
                 .orderByDesc(ReportEntity::getId));
     }
-}
 
+    public ReportEntity updateContent(long userId, long reportId, String content) {
+        ReportEntity existing = reportMapper.selectOne(new LambdaQueryWrapper<ReportEntity>()
+                .eq(ReportEntity::getId, reportId)
+                .eq(ReportEntity::getUserId, userId));
+        if (existing == null) {
+            return null;
+        }
+        existing.setContent(content);
+        reportMapper.updateById(existing);
+        return reportMapper.selectById(reportId);
+    }
+}

@@ -3,7 +3,11 @@ package com.workfootprint.dto.record;
 import java.time.LocalDate;
 
 public class UpdateWorkRecordRequest {
+    private String rawContent;
     private LocalDate recordDate;
+    private Long projectId;
+    private Long moduleId;
+    private Long taskId;
     private String projectName;
     private String moduleName;
     private String taskSummary;
@@ -13,12 +17,44 @@ public class UpdateWorkRecordRequest {
     private String tagsJson;
     private String status;
 
+    public String getRawContent() {
+        return rawContent;
+    }
+
+    public void setRawContent(String rawContent) {
+        this.rawContent = rawContent;
+    }
+
     public LocalDate getRecordDate() {
         return recordDate;
     }
 
     public void setRecordDate(LocalDate recordDate) {
         this.recordDate = recordDate;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+    public Long getModuleId() {
+        return moduleId;
+    }
+
+    public void setModuleId(Long moduleId) {
+        this.moduleId = moduleId;
+    }
+
+    public Long getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
     }
 
     public String getProjectName() {
@@ -85,4 +121,3 @@ public class UpdateWorkRecordRequest {
         this.status = status;
     }
 }
-

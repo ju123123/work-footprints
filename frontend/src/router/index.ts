@@ -9,6 +9,8 @@ const router = createRouter({
     { path: '/inbox', component: () => import('../views/InboxView.vue') },
     { path: '/records', component: () => import('../views/RecordsView.vue') },
     { path: '/reports', component: () => import('../views/ReportsView.vue') },
+    { path: '/projects', component: () => import('../views/ProjectsView.vue') },
+    { path: '/stats', component: () => import('../views/StatsView.vue') },
   ],
 })
 
@@ -23,4 +25,3 @@ router.beforeEach((to) => {
 })
 
 export default router
-
